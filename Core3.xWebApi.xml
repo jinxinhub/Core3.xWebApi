@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Core3.xWebApi</name>
+    </assembly>
+    <members>
+        <member name="M:Core3.xWebApi.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            像服务容器中 注册服务
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:Core3.xWebApi.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            在ConfigureServices之后调用，配置请求管道，添加各种中间件
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
+        </member>
+    </members>
+</doc>

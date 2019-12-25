@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace Core3.xWebApi
 {
@@ -37,6 +38,16 @@ namespace Core3.xWebApi
             {
                 options.UseSqlite("Data Source=company.db");
             });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "JinXinApi", Version = "v1" });
+                // 加载程序集的xml描述文档
+                var baseDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
+                var xmlFile = System.AppDomain.CurrentDomain.FriendlyName + ".xml";
+                var xmlPath = Path.Combine(baseDirectory, xmlFile);
+
+                c.IncludeXmlComments(xmlPath);
+            });
         }
 
         /// <summary>
@@ -53,17 +64,30 @@ namespace Core3.xWebApi
                 app.UseDeveloperExceptionPage();
             }
 
+            ///使用静态文件
+            app.UseStaticFiles();
+
             //路由中间件
             app.UseRouting();
 
             //授权
             app.UseAuthorization();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
+
             //把请求分配到各个特定的Controller和Action上面
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
+
+
         }
     }
 }
