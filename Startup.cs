@@ -35,7 +35,7 @@ namespace Core3.xWebApi
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddDbContext<WebApiDbContext>(options =>
             {
-                options.UseSqlite("Data Source=blog.db");
+                options.UseSqlite("Data Source=company.db");
             });
         }
 

@@ -1,4 +1,5 @@
-﻿using Core3.xWebApi.Entities;
+﻿using Core3.xWebApi.Data;
+using Core3.xWebApi.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,15 @@ namespace Core3.xWebApi.Services
 {
     public class CompanyRepository : ICompanyRepository
     {
-        public Task<IEnumerable<Company>> GetCompany()
+        private readonly WebApiDbContext _context;
+
+        public CompanyRepository(WebApiDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
+        }
+        public async Task<IEnumerable<Company>> GetCompany()
+        {
+            return _context.Companies.ToList();
         }
     }
 }
