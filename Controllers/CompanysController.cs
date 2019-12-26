@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core3.xWebApi.Entities;
 using Core3.xWebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,14 @@ namespace Core3.xWebApi.Controllers
         public async Task<IActionResult> GetCompanies()
         {
             var companies = await _companyRepository.GetCompany();
+            return new JsonResult(companies);
+        }
+
+        [HttpPost]
+        [Route("Companys/InsertNewCompany")]
+        public async Task<IActionResult> InsertNewCompany(Company company)
+        {
+            var companies = await _companyRepository.InsertNewCompany(company);
             return new JsonResult(companies);
         }
     }

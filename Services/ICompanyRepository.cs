@@ -8,7 +8,9 @@ namespace Core3.xWebApi.Services
 {
     public interface ICompanyRepository
     {
-        Task<IEnumerable<Company>> GetCompany();
+        Task<List<Company>> GetCompany();
+
+        Task<bool> InsertNewCompany(Company company);
 
     }
 }

@@ -48,6 +48,10 @@ namespace Core3.xWebApi
 
                 c.IncludeXmlComments(xmlPath);
             });
+            services.AddStackExchangeRedisCache(option => {
+                option.Configuration = "127.0.0.1:6379";//　Configuration：连接redis的链接。
+                option.InstanceName = "WebApiDemoRedis";//InstaceName：实例名，加在redis的key前面的。
+            });
         }
 
         /// <summary>
@@ -64,7 +68,7 @@ namespace Core3.xWebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            ///使用静态文件
+            //使用静态文件
             app.UseStaticFiles();
 
             //路由中间件
