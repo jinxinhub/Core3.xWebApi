@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Core3.xWebApi.Services
 {
+
     public class CompanyRepository : ICompanyRepository
     {
         private readonly WebApiDbContext _context;
@@ -19,6 +21,8 @@ namespace Core3.xWebApi.Services
             _context = context;
             _redisCacheHelper = new RedisCacheHelper();
         }
+
+        [Authorize(Roles = "Admin")]
         public async Task<List<Company>> GetCompany()
         {
            var redisValueList =  await _redisCacheHelper.GetCacheListRight("Company");
@@ -33,6 +37,7 @@ namespace Core3.xWebApi.Services
             return resList;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<bool> InsertNewCompany(Company company)
         {
             var newId = await _context.Companies.AddAsync(company);

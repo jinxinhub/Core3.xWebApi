@@ -14,6 +14,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace Core3.xWebApi
 {
@@ -33,16 +37,78 @@ namespace Core3.xWebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            //讲JSON里面的配置信息 存入定义好的实体类中 方便后续其他层面的代码使用
+            var appSettings = Configuration.GetSection("Audience");
+            services.Configure<AppSettings>(appSettings);
+            //依赖注入公司服务类数据
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddDbContext<WebApiDbContext>(options =>
             {
+                //新增数据库链接,如果EF的迁移完成 则会再项目目录下生产一个DB文件
                 options.UseSqlite("Data Source=company.db");
+            });
+
+            //获取Token认证的Secret
+            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["Audience:Secret"]));
+            services.AddAuthentication("Bearer").AddJwtBearer(option =>
+            {
+                option.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    //是否开启密钥认证和key值
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = signingKey,
+
+                    //是否开启发行人认证和发行人
+                    ValidateIssuer = true,
+                    ValidIssuer = Configuration["Audience:Issuer"],
+
+                    //是否开启订阅人认证和订阅人
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["Audience:Audience"],
+
+                    //认证时间的偏移量
+                    ClockSkew = TimeSpan.Zero,
+                    //是否开启时间认证
+                    ValidateLifetime = true,
+                    //是否该令牌必须带有过期时间
+                    RequireExpirationTime = true
+
+                };
+
+            });
+            services.AddAuthorization(option =>
+            {
+                option.AddPolicy("Client",policy=> policy.RequireRole("Client").Build());
+                option.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
+                option.AddPolicy("SystemOrAdmin", policy => policy.RequireRole("Admin", "System"));
             });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "JinXinApi", Version = "v1" });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Description = "Please enter into field the word 'Bearer' followed by a space and the JWT value",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    { new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference()
+                        {
+                            Id = "Bearer",
+                            Type = ReferenceType.SecurityScheme
+                        }
+                    }, Array.Empty<string>() }
+                });
+
                 // 加载程序集的xml描述文档
+                // 1.获取运行时根目录
                 var baseDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
+                // 2.这个就是刚刚配置的xml文件名
                 var xmlFile = System.AppDomain.CurrentDomain.FriendlyName + ".xml";
                 var xmlPath = Path.Combine(baseDirectory, xmlFile);
 
@@ -56,6 +122,7 @@ namespace Core3.xWebApi
 
         /// <summary>
         /// 在ConfigureServices之后调用，配置请求管道，添加各种中间件
+        /// 关键点：HTTP管道是有先后顺序的 
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
@@ -68,14 +135,16 @@ namespace Core3.xWebApi
                 app.UseDeveloperExceptionPage();
             }
 
+            //授权   
+            app.UseAuthentication();
+            //            app.UseAuthorization();
+
             //使用静态文件
             app.UseStaticFiles();
 
             //路由中间件
             app.UseRouting();
 
-            //授权
-            app.UseAuthorization();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
