@@ -41,9 +41,7 @@ namespace Core3.xWebApi.Services
             {
                 return false;
             }
-
             await _redisCacheHelper.ClearCacheByKey("Company");
-
             return true;
         }
     }
