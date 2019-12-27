@@ -36,11 +36,14 @@ namespace Core3.xWebApi.Services
         public async Task<bool> InsertNewCompany(Company company)
         {
             var newId = await _context.Companies.AddAsync(company);
-            await _context.SaveChangesAsync();
-            if (newId == null)
+            var result = await _context.SaveChangesAsync();
+            if (result == 0)
             {
                 return false;
             }
+
+            await _redisCacheHelper.ClearCacheByKey("Company");
+
             return true;
         }
     }

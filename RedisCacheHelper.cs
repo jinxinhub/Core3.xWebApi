@@ -50,5 +50,16 @@ namespace Core3.xWebApi
             //底部获取一个
            return  await DB.ListRightPopAsync(key);
         }
+
+        /// <summary>
+        /// 清除某个缓存
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public async Task<bool> ClearCacheByKey(string key)
+        {
+          return  await DB.KeyDeleteAsync(key);
+
+        }
     }
 }
