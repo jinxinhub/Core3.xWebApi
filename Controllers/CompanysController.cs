@@ -31,6 +31,7 @@ namespace Core3.xWebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [Route("Companys/InsertNewCompany")]
         public async Task<IActionResult> InsertNewCompany(Company company)
         {
