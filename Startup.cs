@@ -37,9 +37,7 @@ namespace Core3.xWebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            //讲JSON里面的配置信息 存入定义好的实体类中 方便后续其他层面的代码使用
-            var appSettings = Configuration.GetSection("Audience");
-            services.Configure<AppSettings>(appSettings);
+
             //依赖注入公司服务类数据
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddDbContext<WebApiDbContext>(options =>
@@ -72,13 +70,11 @@ namespace Core3.xWebApi
                     ValidateLifetime = true,
                     //是否该令牌必须带有过期时间
                     RequireExpirationTime = true
-
                 };
-
             });
             services.AddAuthorization(option =>
             {
-                option.AddPolicy("Client",policy=> policy.RequireRole("Client").Build());
+                option.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
                 option.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
                 option.AddPolicy("SystemOrAdmin", policy => policy.RequireRole("Admin", "System"));
             });
@@ -88,7 +84,7 @@ namespace Core3.xWebApi
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
-                    Description = "Please enter into field the word 'Bearer' followed by a space and the JWT value",
+                    Description = "JWT授权(数据将在请求头中进行传输) 直接在下框中输入Bearer {token}（注意两者之间是一个空格）\"",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
@@ -114,7 +110,8 @@ namespace Core3.xWebApi
 
                 c.IncludeXmlComments(xmlPath);
             });
-            services.AddStackExchangeRedisCache(option => {
+            services.AddStackExchangeRedisCache(option =>
+            {
                 option.Configuration = "127.0.0.1:6379";//　Configuration：连接redis的链接。
                 option.InstanceName = "WebApiDemoRedis";//InstaceName：实例名，加在redis的key前面的。
             });
@@ -122,7 +119,7 @@ namespace Core3.xWebApi
 
         /// <summary>
         /// 在ConfigureServices之后调用，配置请求管道，添加各种中间件
-        /// 关键点：HTTP管道是有先后顺序的 
+        /// 关键点：HTTP管道是有先后顺序的
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
@@ -134,9 +131,11 @@ namespace Core3.xWebApi
                 //如果是则返回开发异常页面
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseHsts();
+            }
 
-            //授权   
-            app.UseAuthentication();
             //            app.UseAuthorization();
 
             //使用静态文件
@@ -144,7 +143,10 @@ namespace Core3.xWebApi
 
             //路由中间件
             app.UseRouting();
+            //认证服务
+            app.UseAuthentication();
 
+            app.UseAuthorization();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -156,11 +158,8 @@ namespace Core3.xWebApi
             //把请求分配到各个特定的Controller和Action上面
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapDefaultControllerRoute();
             });
-
-
-
         }
     }
 }

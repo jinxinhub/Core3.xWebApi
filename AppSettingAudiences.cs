@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Core3.xWebApi
 {
-    public class AppSettings
+    public class AppSettingAudiences
     {
         public string Secret { get; set; }
         public string Issuer { get; set; }

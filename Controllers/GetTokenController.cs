@@ -6,14 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Core3.xWebApi.Controllers
 {
-    public class GetTokenController : Controller
+    [ApiController]
+    public class GetTokenController : ControllerBase
     {
         /// <summary>
         /// 获取token
         /// </summary>
         /// <returns></returns>
-        public async Task<ActionResult<string>> GetToken(string name, string pwd)
+        [HttpGet]
+        [Route("GetToken/GetNewToken")]
+        public async Task<ActionResult<string>> GetNewToken(string name, string pwd)
         {
+            bool suc = false;
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(pwd))
             {
                 return new JsonResult(new
@@ -22,17 +26,18 @@ namespace Core3.xWebApi.Controllers
                     message = "用户名或密码不能为空"
                 });
             }
-            TokenModelJWT tokenModel = new TokenModelJWT();
-            tokenModel.Uid = 1;
-            tokenModel.Role = name;
-
-            var jwtStr = JwtHelper.IssueJWT(tokenModel);
-            var suc = true;
-            return Ok(new
+            else
             {
-                success = suc,
-                token = jwtStr
-            });
+                TokenModelJWT tokenModel = new TokenModelJWT();
+                tokenModel.Uid = 1;
+                tokenModel.Role = name;
+
+                var jwStr = JwtHelper.IssueJWT(tokenModel);
+                suc = true;
+
+                return Ok(
+                    new { success = suc, token = jwStr });
+            }
         }
     }
 }

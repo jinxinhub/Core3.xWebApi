@@ -4,6 +4,51 @@
         <name>Core3.xWebApi</name>
     </assembly>
     <members>
+        <member name="M:Core3.xWebApi.Controllers.GetTokenController.GetNewToken(System.String,System.String)">
+            <summary>
+            获取token
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Core3.xWebApi.JsonHelper.ToJson``1(``0)">
+            <summary>
+            JSON序列化
+            </summary>
+        </member>
+        <member name="M:Core3.xWebApi.JsonHelper.JsonToObj``1(System.String)">
+            <summary>
+            JSON反序列化
+            </summary>
+        </member>
+        <member name="M:Core3.xWebApi.RedisCacheHelper.SetCacheString(System.String,System.String)">
+            <summary>
+            添加缓存(单个字符串)
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Core3.xWebApi.RedisCacheHelper.SetCacheListRightPush(StackExchange.Redis.RedisKey,System.String)">
+            <summary>
+            底部插入
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Core3.xWebApi.RedisCacheHelper.GetCacheListRight(System.String)">
+            <summary>
+            底部获取
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Core3.xWebApi.RedisCacheHelper.ClearCacheByKey(System.String)">
+            <summary>
+            清除某个缓存
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
         <member name="M:Core3.xWebApi.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             像服务容器中 注册服务
@@ -13,9 +58,30 @@
         <member name="M:Core3.xWebApi.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
             <summary>
             在ConfigureServices之后调用，配置请求管道，添加各种中间件
+            关键点：HTTP管道是有先后顺序的
             </summary>
             <param name="app"></param>
             <param name="env"></param>
+        </member>
+        <member name="T:Core3.xWebApi.TokenModelJWT">
+            <summary>
+            令牌
+            </summary>
+        </member>
+        <member name="P:Core3.xWebApi.TokenModelJWT.Uid">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:Core3.xWebApi.TokenModelJWT.Role">
+            <summary>
+            角色
+            </summary>
+        </member>
+        <member name="P:Core3.xWebApi.TokenModelJWT.Work">
+            <summary>
+            职能
+            </summary>
         </member>
     </members>
 </doc>
