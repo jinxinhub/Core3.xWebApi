@@ -143,10 +143,16 @@ namespace Core3.xWebApi
 
             //路由中间件
             app.UseRouting();
-            //认证服务
-            app.UseAuthentication();
 
+            #region 认证和授权
+
+            //你要登陆论坛，输入用户名张三，密码1234，密码正确，证明你张三确实是张三，这就是 authentication；再一check用户张三是个版主，所以有权限加精删别人帖，这就是 authorization。
+            //认证中间件
+            app.UseAuthentication();
+            //授权中间件
             app.UseAuthorization();
+
+            #endregion 认证和授权
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
